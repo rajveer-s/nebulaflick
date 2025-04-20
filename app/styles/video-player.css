@@ -4,6 +4,28 @@
   --vjs-theme-nebula--secondary: #fff;
 }
 
+/* Fix scrolling issues by ensuring the player container is fixed */
+.video-js {
+  overflow: hidden !important;
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+
+.video-js.vjs-fill {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+
+.video-js.vjs-fluid {
+  padding-top: 0 !important;
+}
+
 .video-js.vjs-theme-nebula .vjs-big-play-button {
   width: 70px;
   height: 70px;
@@ -15,10 +37,26 @@
   margin-top: -35px;
 }
 
+/* Improved control bar positioning */
 .video-js.vjs-theme-nebula .vjs-control-bar {
   background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0));
-  height: 54px;
+  height: 60px;
   padding: 0 12px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+.video-js.vjs-theme-nebula.vjs-user-inactive .vjs-control-bar {
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.vjs-control-bar-fixed {
+  display: flex !important;
+  visibility: visible !important;
 }
 
 .video-js.vjs-theme-nebula .vjs-button > .vjs-icon-placeholder:before {
@@ -38,12 +76,12 @@
 }
 
 .video-js.vjs-theme-nebula .vjs-progress-holder {
-  height: 4px;
+  height: 6px;
   margin: 0;
 }
 
 .video-js.vjs-theme-nebula .vjs-progress-holder:hover {
-  height: 6px;
+  height: 8px;
 }
 
 .video-js.vjs-theme-nebula .vjs-play-progress:before {
@@ -56,7 +94,8 @@
 
 .video-js.vjs-theme-nebula .vjs-time-control {
   padding: 0 4px;
-  line-height: 54px;
+  line-height: 60px;
+  font-size: 14px;
 }
 
 .video-js.vjs-theme-nebula .vjs-picture-in-picture-control {
@@ -67,4 +106,18 @@
   .video-js.vjs-theme-nebula .vjs-picture-in-picture-control {
     display: block;
   }
-} 
+}
+
+/* Full-screen video container */
+.video-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Fill the container while keeping aspect ratio */
+.vjs-fill {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { use } from 'react';
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
 import { Play, Star, Clock, Calendar, Loader2 } from 'lucide-react';
 import { tmdb } from '@/app/utils/tmdb';
 import { getGenreName } from '@/app/utils/genres';
@@ -11,13 +11,10 @@ import VideoPlayer from '@/app/components/VideoPlayer';
 import MovieCarousel from '@/app/components/MovieCarousel';
 import StreamModal from '@/app/components/StreamModal';
 
-interface Genre {
-  id: number;
-  name: string;
-}
+export default function MoviePage() {
+  const params = useParams();
+  const movieId = params.id as string;
 
-export default function MoviePage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
   const [movie, setMovie] = useState<any>(null);
   const [streams, setStreams] = useState<any[]>([]);
   const [showStreamModal, setShowStreamModal] = useState(false);
@@ -27,8 +24,9 @@ export default function MoviePage({ params }: { params: Promise<{ id: string }> 
   useEffect(() => {
     async function loadMovie() {
       try {
-        const movieData = await tmdb.getMovie(resolvedParams.id);
-        const imdbId = await tmdb.getImdbId('movie', resolvedParams.id);
+        // Fetch movie details from TMDB
+        const movieData = await tmdb.getMovie(movieId);
+        const imdbId = await tmdb.getImdbId('movie', movieId);
         setMovie({ ...movieData, imdbId });
       } catch (error) {
         console.error('Failed to load movie:', error);
@@ -37,7 +35,7 @@ export default function MoviePage({ params }: { params: Promise<{ id: string }> 
       }
     }
     loadMovie();
-  }, [resolvedParams.id]);
+  }, [movieId]);
 
   if (isInitialLoading) {
     return (
@@ -65,7 +63,7 @@ export default function MoviePage({ params }: { params: Promise<{ id: string }> 
 
       // Fetch streams from configured Torrentio endpoint
       const streams = await torrentio.getStreams('movie', movie.imdbId);
-      
+
       if (streams.length === 0) {
         alert('No streams found for this movie');
         return;
@@ -81,20 +79,24 @@ export default function MoviePage({ params }: { params: Promise<{ id: string }> 
     }
   };
 
-  const trailerUrl = tmdb.getTrailer(movie.videos);
+  const trailerUrl = movie.videos ? tmdb.getTrailer(movie.videos) : null;
+  const posterUrl = tmdb.getImageUrl(movie.poster_path);
+  const backdropUrl = tmdb.getImageUrl(movie.backdrop_path);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-nebula-950 to-black">
       {/* Hero Section */}
       <div className="relative h-[85vh] w-full">
         <div className="absolute inset-0">
-          <Image
-            src={tmdb.getImageUrl(movie.backdrop_path)}
-            alt={movie.title}
-            fill
-            className="object-cover"
-            priority
-          />
+          {backdropUrl && (
+            <Image
+              src={backdropUrl}
+              alt={movie.title}
+              fill
+              className="object-cover"
+              priority
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent" />
         </div>
@@ -104,49 +106,63 @@ export default function MoviePage({ params }: { params: Promise<{ id: string }> 
             <div className="flex flex-col md:flex-row gap-8 items-start">
               {/* Movie Poster */}
               <div className="shrink-0 w-48 md:w-64 rounded-lg overflow-hidden">
-                <Image
-                  src={tmdb.getImageUrl(movie.poster_path, 'w500')}
-                  alt={movie.title}
-                  width={256}
-                  height={384}
-                  className="w-full"
-                />
+                {posterUrl && (
+                  <Image
+                    src={posterUrl}
+                    alt={movie.title}
+                    width={256}
+                    height={384}
+                    className="w-full"
+                  />
+                )}
               </div>
 
               {/* Movie Info */}
               <div className="flex-1">
                 <h1 className="text-4xl font-bold mb-4">{movie.title}</h1>
                 <div className="flex flex-wrap items-center gap-4 text-sm mb-6">
-                  <span className="flex items-center">
-                    <Star className="w-4 h-4 mr-1" />
-                    {movie.vote_average.toFixed(1)}
-                  </span>
-                  <span className="flex items-center">
-                    <Clock className="w-4 h-4 mr-1" />
-                    {tmdb.formatRuntime(movie.runtime)}
-                  </span>
-                  <span className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-1" />
-                    {tmdb.formatYear(movie.release_date)}
-                  </span>
-                  <span>{movie.genres?.map((g: Genre) => g.name).join(', ')}</span>
+                  {movie.vote_average && (
+                    <span className="flex items-center">
+                      <Star className="w-4 h-4 mr-1" />
+                      {typeof movie.vote_average === 'number' ? movie.vote_average.toFixed(1) : movie.vote_average}
+                    </span>
+                  )}
+                  {movie.runtime && (
+                    <span className="flex items-center">
+                      <Clock className="w-4 h-4 mr-1" />
+                      {tmdb.formatRuntime(movie.runtime)}
+                    </span>
+                  )}
+                  {movie.release_date && (
+                    <span className="flex items-center">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      {typeof movie.release_date === 'string' 
+                        ? tmdb.formatYear(movie.release_date) 
+                        : movie.release_date}
+                    </span>
+                  )}
+                  {movie.genres && (
+                    <span>{movie.genres?.map((g: any) => g.name).join(', ')}</span>
+                  )}
                 </div>
 
                 <p className="text-lg text-white/90 mb-8">{movie.overview}</p>
 
                 <div className="flex gap-4">
-                  <button
-                    onClick={handlePlayClick}
-                    disabled={isLoading}
-                    className="flex items-center gap-2 px-8 py-3 bg-white text-black rounded-lg font-semibold hover:bg-white/90 transition disabled:opacity-50"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      <Play className="w-5 h-5" />
-                    )}
-                    Watch Now
-                  </button>
+                  {movie.imdbId && (
+                    <button
+                      onClick={handlePlayClick}
+                      disabled={isLoading}
+                      className="flex items-center gap-2 px-8 py-3 bg-white text-black rounded-lg font-semibold hover:bg-white/90 transition disabled:opacity-50"
+                    >
+                      {isLoading ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <Play className="w-5 h-5" />
+                      )}
+                      Watch Now
+                    </button>
+                  )}
                   {trailerUrl && (
                     <button
                       onClick={() => window.open(trailerUrl, '_blank')}
@@ -185,6 +201,7 @@ export default function MoviePage({ params }: { params: Promise<{ id: string }> 
         <StreamModal
           streams={streams}
           onClose={() => setShowStreamModal(false)}
+          movieTitle={movie.title}
         />
       )}
     </main>

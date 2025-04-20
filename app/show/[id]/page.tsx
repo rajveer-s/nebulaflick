@@ -208,6 +208,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
         <StreamModal
           streams={streams}
           onClose={() => setShowStreamModal(false)}
+          movieTitle={`${show.name} - S${selectedSeason}E${selectedEpisode}`}
         />
       )}
     </main>

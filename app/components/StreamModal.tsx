@@ -9,11 +9,29 @@ import { torrentio } from '../utils/torrentio';
 interface StreamModalProps {
   streams: TorrentioStream[];
   onClose: () => void;
+  movieTitle?: string;
 }
 
-export default function StreamModal({ streams, onClose }: StreamModalProps) {
+// Helper function to get the quality priority for sorting
+const getQualityPriority = (quality: string): number => {
+  if (quality.includes('4k') || quality.includes('2160') || quality.includes('uhd')) return 1;
+  if (quality.includes('1080')) return 2;
+  if (quality.includes('720')) return 3;
+  if (quality.includes('480')) return 4;
+  if (quality.includes('360')) return 5;
+  return 6; // Other or unknown quality
+};
+
+export default function StreamModal({ streams, onClose, movieTitle = 'Movie' }: StreamModalProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<string | null>(null);
+
+  // Sort streams by quality
+  const sortedStreams = [...streams].sort((a, b) => {
+    const infoA = torrentio.extractStreamInfo(a.name);
+    const infoB = torrentio.extractStreamInfo(b.name);
+    return getQualityPriority(infoA.quality.toLowerCase()) - getQualityPriority(infoB.quality.toLowerCase());
+  });
 
   const handleStreamSelect = async (stream: TorrentioStream) => {
     try {
@@ -30,16 +48,18 @@ export default function StreamModal({ streams, onClose }: StreamModalProps) {
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center">
       <div className="bg-nebula-900/95 rounded-xl max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col">
-        <div className="p-4 border-b border-white/10 flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Available Streams</h2>
-          <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg transition">
-            <X className="w-5 h-5" />
-          </button>
+        <div className="p-4 border-b border-white/10 flex flex-col">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold">Available Streams</h2>
+            <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg transition">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
         
         <div className="p-4 overflow-y-auto flex-1">
           <div className="space-y-3">
-            {streams.map((stream) => {
+            {sortedStreams.map((stream) => {
               const info = torrentio.extractStreamInfo(stream.name);
               return (
                 <div
@@ -49,7 +69,7 @@ export default function StreamModal({ streams, onClose }: StreamModalProps) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="px-2 py-0.5 bg-nebula-700 rounded text-sm font-medium">
-                        {info.quality}
+                        {movieTitle} - {info.quality}
                       </span>
                       {info.source && (
                         <span className="px-2 py-0.5 bg-nebula-800 rounded text-sm">
