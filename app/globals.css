@@ -1,26 +1,31 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+::-webkit-scrollbar-track {
+  @apply bg-black;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+::-webkit-scrollbar-thumb {
+  @apply bg-nebula-800 rounded-full;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Video.js custom theme */
+.vjs-theme-nebula {
+  --vjs-theme-nebula--primary: #4d4dff;
+  --vjs-theme-nebula--secondary: #fff;
+}
+
+.vjs-theme-nebula .vjs-big-play-button {
+  @apply bg-nebula-600 text-white rounded-full border-none;
+  width: 70px;
+  height: 70px;
+  line-height: 70px;
+  margin: -35px 0 0 -35px;
 }
