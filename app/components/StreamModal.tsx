@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Play, X, Loader2 } from 'lucide-react';
 import type { TorrentioStream } from '../utils/torrentio';
-import { realDebrid } from '../utils/real-debrid';
+import { torrentio } from '../utils/torrentio';
 
 interface StreamModalProps {
   streams: TorrentioStream[];
@@ -18,10 +18,9 @@ export default function StreamModal({ streams, onClose }: StreamModalProps) {
   const handleStreamSelect = async (stream: TorrentioStream) => {
     try {
       setIsLoading(stream.url);
-      const { download_link } = await realDebrid.unrestrict(stream.url);
-      router.push(`/watch?url=${encodeURIComponent(download_link)}`);
+      router.push(`/watch?url=${encodeURIComponent(stream.url)}`);
     } catch (error) {
-      console.error('Failed to unrestrict stream:', error);
+      console.error('Failed to start stream:', error);
       alert('Failed to start stream. Please try another source.');
     } finally {
       setIsLoading(null);
@@ -41,7 +40,7 @@ export default function StreamModal({ streams, onClose }: StreamModalProps) {
         <div className="p-4 overflow-y-auto flex-1">
           <div className="space-y-3">
             {streams.map((stream) => {
-              const info = realDebrid.extractStreamInfo(stream.name);
+              const info = torrentio.extractStreamInfo(stream.name);
               return (
                 <div
                   key={stream.url}

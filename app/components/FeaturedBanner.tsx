@@ -19,7 +19,7 @@ interface FeaturedBannerProps {
 
 export default function FeaturedBanner({ movie, type = 'movie' }: FeaturedBannerProps) {
   return (
-    <div className="relative h-[85vh] w-full">
+    <div className="relative h-[100vh] w-full">
       {/* Backdrop Image */}
       <div className="absolute inset-0">
         <Image
@@ -34,13 +34,13 @@ export default function FeaturedBanner({ movie, type = 'movie' }: FeaturedBanner
         />
         {/* Gradient Overlays for cinematic effect */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent" />
       </div>
 
       {/* Content */}
       <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-full items-center">
-          <div className="max-w-2xl pt-32">
+          <div className="max-w-2xl">
             <div className="mb-4">
               <span className="text-sm font-medium px-3 py-1 bg-white/10 backdrop-blur-sm rounded-full">
                 New {type === 'show' ? 'Show' : 'Movie'}
@@ -56,10 +56,6 @@ export default function FeaturedBanner({ movie, type = 'movie' }: FeaturedBanner
             </div>
             <p className="text-lg text-white/80 mb-8 line-clamp-3 leading-relaxed">{movie.description}</p>
             <div className="flex gap-4">
-              <button className="flex items-center gap-2 px-8 py-3 bg-white rounded-lg font-semibold transition text-black hover:bg-white/90">
-                <Play className="h-5 w-5" />
-                Watch Movie
-              </button>
               <Link 
                 href={`/${type}/${movie.id}`}
                 className="flex items-center gap-2 px-8 py-3 bg-white/10 backdrop-blur-sm rounded-lg font-semibold transition hover:bg-white/20"

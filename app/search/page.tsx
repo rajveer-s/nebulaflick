@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Star } from 'lucide-react';
 import { tmdb } from '@/app/utils/tmdb';
 import { getPrimaryGenre } from '@/app/utils/genres';
-import Navbar from '@/app/components/Navbar';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 
 async function searchMovies(query: string) {
@@ -25,9 +24,7 @@ export default async function SearchPage({
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-nebula-950 to-black">
-      <Navbar />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl font-bold mb-8">
           {query ? `Search results for "${query}"` : 'Search Movies'}
         </h1>
@@ -78,4 +75,4 @@ export default async function SearchPage({
       </div>
     </main>
   );
-} 
+}

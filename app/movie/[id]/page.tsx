@@ -11,7 +11,6 @@ import { realDebrid } from '@/app/utils/real-debrid';
 import VideoPlayer from '@/app/components/VideoPlayer';
 import MovieCarousel from '@/app/components/MovieCarousel';
 import StreamModal from '@/app/components/StreamModal';
-import Navbar from '@/app/components/Navbar';
 
 interface Genre {
   id: number;
@@ -60,29 +59,20 @@ export default function MoviePage({ params }: { params: Promise<{ id: string }> 
   const handlePlayClick = async () => {
     try {
       setIsLoading(true);
-      const rdToken = realDebrid.getToken();
-      if (!rdToken) {
-        alert('Please set your Real-Debrid token in settings');
-        return;
-      }
-
       if (!movie.imdbId) {
         alert('IMDb ID not found for this movie');
         return;
       }
 
-      // Fetch streams from Torrentio
-      const allStreams = await torrentio.getStreams('movie', movie.imdbId, rdToken);
+      // Fetch streams from configured Torrentio endpoint
+      const streams = await torrentio.getStreams('movie', movie.imdbId);
       
-      // Filter only cached streams
-      const cachedStreams = await torrentio.filterCachedStreams(allStreams, rdToken);
-      
-      if (cachedStreams.length === 0) {
-        alert('No cached streams found for this movie');
+      if (streams.length === 0) {
+        alert('No streams found for this movie');
         return;
       }
 
-      setStreams(cachedStreams);
+      setStreams(streams);
       setShowStreamModal(true);
     } catch (error) {
       console.error('Failed to fetch streams:', error);
@@ -96,10 +86,8 @@ export default function MoviePage({ params }: { params: Promise<{ id: string }> 
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-nebula-950 to-black">
-      <Navbar />
-
       {/* Hero Section */}
-      <div className="relative h-[70vh] w-full">
+      <div className="relative h-[85vh] w-full">
         <div className="absolute inset-0">
           <Image
             src={tmdb.getImageUrl(movie.backdrop_path)}
@@ -109,6 +97,7 @@ export default function MoviePage({ params }: { params: Promise<{ id: string }> 
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent" />
         </div>
 
         <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

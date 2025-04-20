@@ -199,7 +199,7 @@ export const tmdb = {
       id: show.id,
       title: show.name,
       posterUrl: tmdb.getImageUrl(show.poster_path, 'w500'),
-      genre: show.genre_ids?.map(id => TMDB_GENRES[id]).join(', ') || 'Unknown',
+      genre: show.genre_ids?.map((id: string | number) => TMDB_GENRES[id]).join(', ') || 'Unknown',
     }));
   },
 
@@ -251,6 +251,13 @@ export const tmdb = {
       popular: tmdb.transformShows(filterByGenre(popular)),
       topRated: tmdb.transformShows(filterByGenre(topRated)),
     };
+  },
+
+  async getSeasonDetails(showId: string, seasonNumber: number) {
+    const response = await fetch(
+      `${TMDB_BASE_URL}/tv/${showId}/season/${seasonNumber}?api_key=${TMDB_API_KEY}&language=en-US`
+    );
+    return response.json();
   },
 
   async getShow(id: string) {

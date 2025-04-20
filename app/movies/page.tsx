@@ -1,9 +1,6 @@
-// 'use client';
-
 import { Suspense } from 'react';
 import { tmdb } from '@/app/utils/tmdb';
 import { getPrimaryGenre } from '../utils/genres';
-import Navbar from '@/app/components/Navbar';
 import FeaturedBanner from '../components/FeaturedBanner';
 import MovieCarousel from '../components/MovieCarousel';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -39,7 +36,6 @@ export default async function MoviesPage() {
   if (!featured) {
     return (
       <main className="min-h-screen bg-gradient-to-b from-black via-nebula-950 to-black">
-        <Navbar />
         <div className="flex items-center justify-center h-screen">
           <p>Failed to load movies. Please try again later.</p>
         </div>
@@ -62,8 +58,6 @@ export default async function MoviesPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-nebula-950 to-black">
-      <Navbar />
-
       <div className="relative">
         <Suspense fallback={<LoadingSpinner />}>
           <FeaturedBanner movie={transformMovie(featured)} type="movie" />

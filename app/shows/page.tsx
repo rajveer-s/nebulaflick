@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { tmdb } from '../utils/tmdb';
 import { getPrimaryGenre, TMDB_GENRES } from '../utils/genres';
-import Navbar from '../components/Navbar';
 import FeaturedBanner from '../components/FeaturedBanner';
 import MovieCarousel from '../components/MovieCarousel';
 
@@ -40,8 +39,6 @@ export default async function ShowsPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-nebula-950 to-black">
-      <Navbar />
-
       <div className="relative">
         <FeaturedBanner movie={transformShow(featured)} type="show" />
 

@@ -14,6 +14,18 @@ const nextConfig = {
     formats: ['image/webp'],
     minimumCacheTTL: 60,
   },
+  async rewrites() {
+    return [
+      {
+        source: '/torrentio/:path*',
+        destination: 'https://torrentio.strem.fun/:path*',
+      },
+      {
+        source: '/realdebrid/:path*',
+        destination: 'https://api.real-debrid.com/:path*',
+      },
+    ];
+  },
   experimental: {
     optimizeCss: true,
     scrollRestoration: true,

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { inter, outfit } from "./utils/fonts";
 import "./globals.css";
 import "./styles/video-player.css";
+import BottomNav from "./components/BottomNav";
 
 export const metadata: Metadata = {
   title: "NebulaFlick - Stream Your Favorite Movies & Shows",
@@ -19,9 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable} bg-black text-white antialiased`}>
       <body className={`${inter.className} ${outfit.className} min-h-screen bg-gradient-to-b from-black via-nebula-950 to-black`}>
-        <div className="pt-20 min-h-screen">
+        <main className="min-h-screen pb-16">
           {children}
-        </div>
+        </main>
+        <BottomNav />
       </body>
     </html>
   );
