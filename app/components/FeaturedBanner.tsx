@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import { Play, Info } from 'lucide-react'
 
 interface Movie {
@@ -13,9 +14,10 @@ interface Movie {
 
 interface FeaturedBannerProps {
   movie: Movie
+  type?: 'movie' | 'show'
 }
 
-export default function FeaturedBanner({ movie }: FeaturedBannerProps) {
+export default function FeaturedBanner({ movie, type = 'movie' }: FeaturedBannerProps) {
   return (
     <div className="relative h-[85vh] w-full">
       {/* Backdrop Image */}
@@ -26,6 +28,9 @@ export default function FeaturedBanner({ movie }: FeaturedBannerProps) {
           fill
           className="object-cover"
           priority
+          loading="eager"
+          sizes="100vw"
+          quality={75}
         />
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
@@ -44,20 +49,23 @@ export default function FeaturedBanner({ movie }: FeaturedBannerProps) {
               </span>
               <span>{movie.duration}</span>
             </div>
-            <p className="text-lg text-white/90 mb-8">{movie.description}</p>
+            <p className="text-lg text-white/90 mb-8 line-clamp-3">{movie.description}</p>
             <div className="flex gap-4">
               <button className="flex items-center gap-2 px-8 py-3 bg-nebula-600 hover:bg-nebula-700 rounded-lg font-semibold transition">
                 <Play className="h-5 w-5" />
                 Play
               </button>
-              <button className="flex items-center gap-2 px-8 py-3 bg-white/20 hover:bg-white/30 rounded-lg font-semibold transition">
+              <Link 
+                href={`/${type}/${movie.id}`}
+                className="flex items-center gap-2 px-8 py-3 bg-white/20 hover:bg-white/30 rounded-lg font-semibold transition"
+              >
                 <Info className="h-5 w-5" />
                 More Info
-              </button>
+              </Link>
             </div>
           </div>
         </div>
       </div>
     </div>
   )
-} 
+}

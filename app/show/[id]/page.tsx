@@ -76,7 +76,7 @@ export default async function ShowPage({ params }: { params: { id: string } }) {
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {show.genres?.map((genre) => (
+                  {show.genres?.map((genre: { id: number; name: string }) => (
                     <span
                       key={genre.id}
                       className="px-3 py-1 bg-white/10 rounded-full text-sm"
@@ -150,4 +150,4 @@ export default async function ShowPage({ params }: { params: { id: string } }) {
       </div>
     </main>
   );
-} 
+}
