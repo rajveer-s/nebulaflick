@@ -1,6 +1,9 @@
+// app/components/FeaturedBanner.tsx
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
-import { Play, Info } from 'lucide-react'
+import { Info } from 'lucide-react'
 
 interface Movie {
   id: string
@@ -17,54 +20,47 @@ interface FeaturedBannerProps {
   type?: 'movie' | 'show'
 }
 
-export default function FeaturedBanner({ movie, type = 'movie' }: FeaturedBannerProps) {
+export default function FeaturedBanner({
+  movie,
+  type = 'movie',
+}: FeaturedBannerProps) {
   return (
-    <div className="relative h-[100vh] w-full">
-      {/* Backdrop Image */}
-      <div className="absolute inset-0">
-        <Image
-          src={movie.backdropUrl}
-          alt={movie.title}
-          fill
-          className="object-cover"
-          priority
-          loading="eager"
-          sizes="100vw"
-          quality={75}
-        />
-        {/* Gradient Overlays for cinematic effect */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent" />
-      </div>
+    <div className="relative h-screen w-full overflow-hidden">
+      {/* Backdrop */}
+      <Image
+        src={movie.backdropUrl}
+        alt={movie.title}
+        fill
+        className="object-cover"
+        priority
+      />
 
-      {/* Content */}
-      <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-full items-center">
-          <div className="max-w-2xl">
-            <div className="mb-4">
-              <span className="text-sm font-medium px-3 py-1 bg-white/10 backdrop-blur-sm rounded-full">
-                New {type === 'show' ? 'Show' : 'Movie'}
-              </span>
-            </div>
-            <h1 className="text-5xl sm:text-7xl font-bold mb-6 leading-tight">{movie.title}</h1>
-            <div className="flex items-center gap-4 text-sm mb-6">
-              <span className="text-white/90">{movie.year}</span>
-              <span className="px-2 py-1 bg-white/10 backdrop-blur-sm rounded-lg text-white/90">
-                {movie.rating}
-              </span>
-              <span className="text-white/90">{movie.duration}</span>
-            </div>
-            <p className="text-lg text-white/80 mb-8 line-clamp-3 leading-relaxed">{movie.description}</p>
-            <div className="flex gap-4">
-              <Link 
-                href={`/${type}/${movie.id}`}
-                className="flex items-center gap-2 px-8 py-3 bg-white/10 backdrop-blur-sm rounded-lg font-semibold transition hover:bg-white/20"
-              >
-                <Info className="h-5 w-5" />
-                More Info
-              </Link>
-            </div>
-          </div>
+      {/* Cinematic Gradients */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"/>
+      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-transparent"/>
+
+      {/* Content at bottom‐left */}
+      <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-end pb-24">
+        <div className="max-w-xl">
+          <span className="inline-block mb-4 px-3 py-1 text-sm font-medium bg-white/10 rounded-full text-white">
+            New {type === 'show' ? 'Show' : 'Movie'}
+          </span>
+
+          <h1 className="text-5xl sm:text-7xl font-bold text-white mb-6 leading-tight">
+            {movie.title}
+          </h1>
+
+          <p className="text-lg text-white/80 mb-8 line-clamp-3">
+            {movie.description}
+          </p>
+
+          <Link
+            href={`/${type}/${movie.id}`}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-semibold rounded-md hover:bg-gray-100 transition"
+          >
+            <Info className="w-5 h-5" />
+            More Info
+          </Link>
         </div>
       </div>
     </div>

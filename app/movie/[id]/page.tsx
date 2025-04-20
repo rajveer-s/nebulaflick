@@ -7,7 +7,6 @@ import { Play, Star, Clock, Calendar, Loader2 } from 'lucide-react';
 import { tmdb } from '@/app/utils/tmdb';
 import { getGenreName } from '@/app/utils/genres';
 import { torrentio } from '@/app/utils/torrentio';
-import { realDebrid } from '@/app/utils/real-debrid';
 import VideoPlayer from '@/app/components/VideoPlayer';
 import MovieCarousel from '@/app/components/MovieCarousel';
 import StreamModal from '@/app/components/StreamModal';

@@ -24,7 +24,7 @@ export default function RootLayout({
           {children}
         </main>
         <BottomNav />
-      </body>
+    </body>
     </html>
   );
 }
