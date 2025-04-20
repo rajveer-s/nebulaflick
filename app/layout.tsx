@@ -17,9 +17,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable} bg-black text-white min-h-screen antialiased`}>
-      <body className={`${inter.className} ${outfit.className} bg-black text-white min-h-screen antialiased`}>
-        {children}
+    <html lang="en" className={`${inter.variable} ${outfit.variable} bg-black text-white antialiased`}>
+      <body className={`${inter.className} ${outfit.className} min-h-screen bg-gradient-to-b from-black via-nebula-950 to-black`}>
+        <div className="pt-20 min-h-screen">
+          {children}
+        </div>
       </body>
     </html>
   );

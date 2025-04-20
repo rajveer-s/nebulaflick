@@ -268,4 +268,18 @@ export const tmdb = {
       similar,
     };
   },
-}; 
+
+  async getImdbId(type: 'movie' | 'show', id: string): Promise<string | null> {
+    try {
+      const endpoint = type === 'show' ? 'tv' : 'movie';
+      const response = await fetch(
+        `${TMDB_BASE_URL}/${endpoint}/${id}/external_ids?api_key=${TMDB_API_KEY}`
+      );
+      const data = await response.json();
+      return data.imdb_id || null;
+    } catch (error) {
+      console.error('Failed to fetch IMDb ID:', error);
+      return null;
+    }
+  },
+};

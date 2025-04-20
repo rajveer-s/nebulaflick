@@ -22,7 +22,7 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 z-50 w-full bg-gradient-to-b from-black/80 to-transparent backdrop-blur-sm">
-      <div className="mx-auto flex h-20 max-w items-center justify-between px-7 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-6">
             <Link 
@@ -79,4 +79,4 @@ export default function Navbar() {
       </div>
     </nav>
   )
-} 
+}
