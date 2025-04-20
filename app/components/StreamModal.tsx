@@ -59,11 +59,11 @@ export default function StreamModal({ streams, onClose, movieTitle = 'Movie' }: 
         
         <div className="p-4 overflow-y-auto flex-1">
           <div className="space-y-3">
-            {sortedStreams.map((stream) => {
+            {sortedStreams.map((stream, index) => {
               const info = torrentio.extractStreamInfo(stream.name);
               return (
                 <div
-                  key={stream.url}
+                  key={`${stream.url}-${index}`}
                   className="flex items-center justify-between p-4 rounded-lg bg-white/5 hover:bg-white/10 transition"
                 >
                   <div className="flex-1 min-w-0">
