@@ -296,4 +296,103 @@ export const tmdb = {
       return null;
     }
   },
+
+  // Get streaming providers for a movie
+  async getProviders(type: 'movie' | 'show', id: string): Promise<any> {
+    try {
+      const endpoint = type === 'show' ? 'tv' : 'movie';
+      const response = await fetch(
+        `${TMDB_BASE_URL}/${endpoint}/${id}/watch/providers?api_key=${TMDB_API_KEY}`
+      );
+      const data = await response.json();
+      return data.results || {};
+    } catch (error) {
+      console.error('Failed to fetch providers:', error);
+      return {};
+    }
+  },
+
+  // Get movies available on a specific provider (like Netflix, Prime)
+  async getMoviesByProvider(providerId: number, region: string = 'US'): Promise<TMDbMovie[]> {
+    try {
+      const response = await fetch(
+        `${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_watch_providers=${providerId}&watch_region=${region}&language=en-US`
+      );
+      const data = await response.json() as TMDbResponse<TMDbMovie>;
+      return data.results || [];
+    } catch (error) {
+      console.error('Failed to fetch movies by provider:', error);
+      return [];
+    }
+  },
+
+  // Get shows available on a specific provider (like Netflix, Prime)
+  async getShowsByProvider(providerId: number, region: string = 'US'): Promise<any[]> {
+    try {
+      const response = await fetch(
+        `${TMDB_BASE_URL}/discover/tv?api_key=${TMDB_API_KEY}&with_watch_providers=${providerId}&watch_region=${region}&language=en-US`
+      );
+      const data = await response.json() as TMDbResponse<any>;
+      return data.results || [];
+    } catch (error) {
+      console.error('Failed to fetch shows by provider:', error);
+      return [];
+    }
+  },
+  
+  // Catalog functions for movies
+  async getMovieCatalogs(region: string = 'US'): Promise<Record<string, any[]>> {
+    const { NETFLIX, HBO_MAX, DISNEY_PLUS, HULU, PRIME_VIDEO, PARAMOUNT_PLUS, PEACOCK } = 
+      await import('./providers').then(mod => mod.STREAMING_PROVIDERS);
+    
+    const [popular, netflix, hboMax, disney, hulu, prime, paramount, peacock] = await Promise.all([
+      this.getPopularMovies(),
+      this.getMoviesByProvider(NETFLIX, region),
+      this.getMoviesByProvider(HBO_MAX, region),
+      this.getMoviesByProvider(DISNEY_PLUS, region),
+      this.getMoviesByProvider(HULU, region),
+      this.getMoviesByProvider(PRIME_VIDEO, region),
+      this.getMoviesByProvider(PARAMOUNT_PLUS, region),
+      this.getMoviesByProvider(PEACOCK, region)
+    ]);
+
+    return {
+      popular: this.transformMovies(popular),
+      netflix: this.transformMovies(netflix),
+      hboMax: this.transformMovies(hboMax),
+      disney: this.transformMovies(disney),
+      hulu: this.transformMovies(hulu),
+      prime: this.transformMovies(prime),
+      paramount: this.transformMovies(paramount),
+      peacock: this.transformMovies(peacock)
+    };
+  },
+
+  // Catalog functions for shows
+  async getShowCatalogs(region: string = 'US'): Promise<Record<string, any[]>> {
+    const { NETFLIX, HBO_MAX, DISNEY_PLUS, HULU, PRIME_VIDEO, PARAMOUNT_PLUS, PEACOCK } = 
+      await import('./providers').then(mod => mod.STREAMING_PROVIDERS);
+    
+    const [popular, netflix, hboMax, disney, hulu, prime, paramount, peacock] = await Promise.all([
+      this.getPopularShows(),
+      this.getShowsByProvider(NETFLIX, region),
+      this.getShowsByProvider(HBO_MAX, region),
+      this.getShowsByProvider(DISNEY_PLUS, region),
+      this.getShowsByProvider(HULU, region),
+      this.getShowsByProvider(PRIME_VIDEO, region),
+      this.getShowsByProvider(PARAMOUNT_PLUS, region),
+      this.getShowsByProvider(PEACOCK, region)
+    ]);
+
+    return {
+      popular: this.transformShows(popular),
+      netflix: this.transformShows(netflix),
+      hboMax: this.transformShows(hboMax),
+      disney: this.transformShows(disney),
+      hulu: this.transformShows(hulu),
+      prime: this.transformShows(prime),
+      paramount: this.transformShows(paramount),
+      peacock: this.transformShows(peacock)
+    };
+  }
 };

@@ -4,6 +4,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Info } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 interface Movie {
   id: string
@@ -16,24 +17,53 @@ interface Movie {
 }
 
 interface FeaturedBannerProps {
-  movie: Movie
+  movies: Movie[]
   type?: 'movie' | 'show'
 }
 
 export default function FeaturedBanner({
-  movie,
+  movies,
   type = 'movie',
 }: FeaturedBannerProps) {
+  const [currentSlide, setCurrentSlide] = useState(0)
+
+  // Change slide every 6 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % movies.length)
+    }, 10000)
+
+    return () => clearInterval(interval)
+  }, [movies.length])
+
+  // Handle indicator click
+  const handleIndicatorClick = (index: number) => {
+    setCurrentSlide(index)
+  }
+
+  if (!movies.length) return null
+  
+  const movie = movies[currentSlide]
+
   return (
-    <div className="relative w-full overflow-hidden h-[60vh] sm:h-[70vh] md:h-[80vh] lg:h-screen">
-      {/* Backdrop */}
-      <Image
-        src={movie.backdropUrl}
-        alt={movie.title}
-        fill
-        className="object-cover"
-        priority
-      />
+    <div className="relative w-full overflow-hidden h-[50vh] sm:h-[55vh] md:h-[65vh] lg:h-[85vh]">
+      {/* Backdrop with smooth transition */}
+      {movies.map((m, index) => (
+        <div
+          key={m.id}
+          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+            index === currentSlide ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <Image
+            src={m.backdropUrl}
+            alt={m.title}
+            fill
+            className="object-cover"
+            priority={index === 0}
+          />
+        </div>
+      ))}
 
       {/* Cinematic Gradients */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"/>
