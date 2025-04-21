@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Calendar } from 'lucide-react';
 
 interface Episode {
   id: number;
@@ -26,6 +26,20 @@ export default function SeasonSelector({ seasons, onEpisodeSelect }: SeasonSelec
   const [selectedSeason, setSelectedSeason] = useState<number>(1);
 
   const currentSeason = seasons.find(s => s.season_number === selectedSeason);
+
+  // Function to format date in a nice readable format
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'No air date';
+    
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Invalid date';
+    
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
 
   return (
     <div className="flex gap-8">
@@ -56,6 +70,10 @@ export default function SeasonSelector({ seasons, onEpisodeSelect }: SeasonSelec
               <div className="flex items-baseline gap-2 mb-1">
                 <p className="font-medium text-lg">Episode {episode.episode_number}</p>
                 <p className="text-base text-white/70 truncate flex-1">{episode.name}</p>
+              </div>
+              <div className="flex items-center gap-1 mb-1 text-white/60 text-sm">
+                <Calendar className="w-3 h-3" />
+                <span>{formatDate(episode.air_date)}</span>
               </div>
               <p className="text-sm text-white/50 line-clamp-2">{episode.overview}</p>
             </div>
