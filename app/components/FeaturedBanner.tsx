@@ -25,7 +25,7 @@ export default function FeaturedBanner({
   type = 'movie',
 }: FeaturedBannerProps) {
   return (
-    <div className="relative h-screen w-full overflow-hidden">
+    <div className="relative w-full overflow-hidden h-[60vh] sm:h-[70vh] md:h-[80vh] lg:h-screen">
       {/* Backdrop */}
       <Image
         src={movie.backdropUrl}
@@ -39,26 +39,26 @@ export default function FeaturedBanner({
       <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"/>
       <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-transparent"/>
 
-      {/* Content at bottom‐left */}
-      <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-end pb-24">
-        <div className="max-w-xl">
-          <span className="inline-block mb-4 px-3 py-1 text-sm font-medium bg-white/10 rounded-full text-white">
+      {/* Content - centered on small screens, bottom-left on larger screens */}
+      <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center sm:items-center md:items-end justify-center sm:justify-center md:justify-start pb-6 md:pb-16 lg:pb-24">
+        <div className="max-w-xl text-center md:text-left">
+          <span className="inline-block mb-2 sm:mb-4 px-3 py-1 text-sm font-medium bg-white/10 rounded-full text-white">
             New {type === 'show' ? 'Show' : 'Movie'}
           </span>
 
-          <h1 className="text-5xl sm:text-7xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-3 sm:mb-6 leading-tight">
             {movie.title}
           </h1>
 
-          <p className="text-lg text-white/80 mb-8 line-clamp-3">
+          <p className="text-base sm:text-lg text-white/80 mb-4 sm:mb-8">
             {movie.description}
           </p>
 
           <Link
             href={`/${type}/${movie.id}`}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-semibold rounded-md hover:bg-gray-100 transition"
+            className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white text-black font-semibold rounded-md hover:bg-gray-100 transition"
           >
-            <Info className="w-5 h-5" />
+            <Info className="w-4 h-4 sm:w-5 sm:h-5" />
             More Info
           </Link>
         </div>

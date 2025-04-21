@@ -1,14 +1,19 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { inter, outfit } from "./utils/fonts";
 import "./globals.css";
 import BottomNavWrapper from "./components/BottomNavWrapper";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#000033",
+};
 
 export const metadata: Metadata = {
   title: "NebulaFlick - Stream Your Favorite Movies & Shows",
   description: "NebulaFlick is your premium streaming platform for movies and TV shows.",
   manifest: "/manifest.json",
-  themeColor: "#000033",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
 };
 
 export default function RootLayout({
