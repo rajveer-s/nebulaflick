@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
-import VideoPlayer from '../components/VideoPlayer';
+import ShakaPlayer from '../components/ShakaPlayer';
 
 export default function WatchPage() {
   const router = useRouter();
@@ -34,12 +34,9 @@ export default function WatchPage() {
         </button>
       </div>
       
-      <VideoPlayer
-        src={videoUrl}
-        autoplay={true}
-        controls={true}
-        className="fixed inset-0 w-full h-full"
-      />
+      <div className="fixed inset-0 w-full h-full">
+        <ShakaPlayer url={videoUrl} />
+      </div>
     </div>
   );
 }

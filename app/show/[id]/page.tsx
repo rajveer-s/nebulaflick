@@ -26,6 +26,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
   const [seasons, setSeasons] = useState<any[]>([]);
   const [selectedSeason, setSelectedSeason] = useState<number | null>(null);
   const [selectedEpisode, setSelectedEpisode] = useState<number | null>(null);
+  const [currentTrailerUrl, setCurrentTrailerUrl] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadShow() {
@@ -40,6 +41,16 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
         );
         const seasonDetails = await Promise.all(seasonPromises);
         setSeasons(seasonDetails);
+        
+        // Set initial trailer from the main show
+        const mainTrailerUrl = tmdb.getTrailer(showData.videos);
+        setCurrentTrailerUrl(mainTrailerUrl);
+        
+        // Set initial selected season if seasons exist
+        if (seasonDetails && seasonDetails.length > 0) {
+          const firstValidSeason = seasonDetails.find((season: any) => season.season_number > 0) || seasonDetails[0];
+          setSelectedSeason(firstValidSeason.season_number);
+        }
       } catch (error) {
         console.error('Failed to load show:', error);
       } finally {
@@ -48,6 +59,30 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
     }
     loadShow();
   }, [resolvedParams.id]);
+
+  const handleSeasonChange = async (seasonNumber: number) => {
+    try {
+      setSelectedSeason(seasonNumber);
+      
+      // Fetch and set the season-specific trailer
+      const seasonVideos = await tmdb.getSeasonVideos(resolvedParams.id, seasonNumber);
+      
+      if (seasonVideos && seasonVideos.results && seasonVideos.results.length > 0) {
+        // Use the same logic as getTrailer but apply it to season videos
+        const seasonTrailerUrl = tmdb.getTrailer(seasonVideos);
+        setCurrentTrailerUrl(seasonTrailerUrl);
+      } else {
+        // If no season-specific trailer is found, fall back to the main show trailer
+        const mainTrailerUrl = tmdb.getTrailer(show.videos);
+        setCurrentTrailerUrl(mainTrailerUrl);
+      }
+    } catch (error) {
+      console.error('Failed to fetch season videos:', error);
+      // Fall back to main trailer in case of error
+      const mainTrailerUrl = tmdb.getTrailer(show.videos);
+      setCurrentTrailerUrl(mainTrailerUrl);
+    }
+  };
 
   const handleEpisodeSelect = async (seasonNumber: number, episodeNumber: number) => {
     try {
@@ -97,12 +132,15 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
     );
   }
 
-  const trailerUrl = tmdb.getTrailer(show.videos);
+  // Format the embed URL for the current trailer
+  const embedTrailerUrl = currentTrailerUrl
+    ? currentTrailerUrl.replace('youtube.com/watch?v=', 'youtube.com/embed/').replace('?v=', '/') + '?rel=0&modestbranding=1&hd=1&controls=1&autoplay=0'
+    : null;
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-nebula-950 to-black">
-      {/* Hero Section */}
-      <div className="relative min-h-screen pb-16 md:pb-24">
+      {/* Hero Section - Improved for better visibility on all screens */}
+      <div className="relative min-h-screen">
         <div className="absolute inset-0">
           <Image
             src={tmdb.getImageUrl(show.backdrop_path)}
@@ -116,23 +154,42 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
         </div>
 
         <div className="relative min-h-screen max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex min-h-screen items-center">
-            <div className="flex flex-col md:flex-row gap-8 items-start py-24">
-              {/* Show Poster */}
-              <div className="shrink-0 w-48 md:w-64 rounded-lg overflow-hidden shadow-2xl">
-                <Image
-                  src={tmdb.getImageUrl(show.poster_path, 'w500')}
-                  alt={show.name}
-                  width={256}
-                  height={384}
-                  className="w-full rounded-lg"
-                />
+          {/* Changed to flex with proper padding instead of absolute positioning */}
+          <div className="flex flex-col justify-center pt-24 pb-16 min-h-screen">
+            <div className="w-full">
+              {/* Poster and Trailer Section */}
+              <div className="flex flex-col md:flex-row gap-6 mb-8">
+                {/* Poster */}
+                <div className="shrink-0 w-48 md:w-64 rounded-lg overflow-hidden shadow-2xl">
+                  <Image
+                    src={tmdb.getImageUrl(show.poster_path, 'w500')}
+                    alt={show.name}
+                    width={256}
+                    height={384}
+                    className="w-full rounded-lg shadow-lg"
+                  />
+                </div>
+
+                {/* Trailer Player */}
+                {embedTrailerUrl && (
+                  <div className="flex-1 w-full aspect-video rounded-lg overflow-hidden shadow-lg">
+                    <iframe
+                      className="w-full h-full rounded-lg"
+                      src={embedTrailerUrl}
+                      title={`${show.name}${selectedSeason ? ` Season ${selectedSeason}` : ''} Trailer`}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
+                )}
               </div>
 
-              {/* Show Info */}
-              <div className="flex-1 space-y-6">
+              {/* Show Info Section - Below poster and trailer */}
+              <div className="max-w-3xl">
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold">{show.name}</h1>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-white/90">
+                
+                <div className="flex flex-wrap items-center gap-4 text-sm text-white/90 my-4">
                   <span className="flex items-center bg-white/10 rounded-full px-3 py-1">
                     <Star className="w-4 h-4 mr-1" />
                     {show.vote_average.toFixed(1)}
@@ -147,20 +204,8 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
                   </span>
                   <span className="bg-white/10 rounded-full px-3 py-1">{show.genres?.map((g: Genre) => g.name).join(', ')}</span>
                 </div>
-
-                <p className="text-base md:text-lg text-white/90 max-w-3xl">{show.overview}</p>
-
-                {trailerUrl && (
-                  <button
-                    onClick={() => window.open(trailerUrl, '_blank')}
-                    className="flex items-center gap-2 px-6 py-3 bg-nebula-600 hover:bg-nebula-700 rounded-lg font-semibold transition-colors duration-200"
-                  >
-                    <Play className="w-5 h-5" />
-                    Watch Trailer
-                  </button>
-                )}
-
-                <div className="pt-6 border-t border-white/10">
+                
+                <div className="mb-4">
                   <h2 className="text-lg font-semibold mb-2">
                     {show.number_of_seasons} Season{show.number_of_seasons !== 1 ? 's' : ''} ·{' '}
                     {show.number_of_episodes} Episode{show.number_of_episodes !== 1 ? 's' : ''}
@@ -168,17 +213,20 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
                   <p className="text-white/70 mb-4">
                     {show.status} · {show.networks?.[0]?.name}
                   </p>
-
-                  {/* Season and Episode Selector */}
-                  {seasons.length > 0 && (
-                    <div className="mt-6">
-                      <SeasonSelector
-                        seasons={seasons}
-                        onEpisodeSelect={handleEpisodeSelect}
-                      />
-                    </div>
-                  )}
                 </div>
+                
+                <p className="text-base md:text-lg text-white/90 mb-8">{show.overview}</p>
+
+                {/* Season and Episode Selector */}
+                {seasons.length > 0 && (
+                  <div className="mt-6 border-t border-white/10 pt-6">
+                    <SeasonSelector
+                      seasons={seasons}
+                      onEpisodeSelect={handleEpisodeSelect}
+                      onSeasonChange={handleSeasonChange}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>

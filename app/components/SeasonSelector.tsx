@@ -20,9 +20,10 @@ interface Season {
 interface SeasonSelectorProps {
   seasons: Season[];
   onEpisodeSelect: (seasonNumber: number, episodeNumber: number) => void;
+  onSeasonChange?: (seasonNumber: number) => void;
 }
 
-export default function SeasonSelector({ seasons, onEpisodeSelect }: SeasonSelectorProps) {
+export default function SeasonSelector({ seasons, onEpisodeSelect, onSeasonChange }: SeasonSelectorProps) {
   const [selectedSeason, setSelectedSeason] = useState<number>(1);
 
   const currentSeason = seasons.find(s => s.season_number === selectedSeason);
@@ -41,13 +42,20 @@ export default function SeasonSelector({ seasons, onEpisodeSelect }: SeasonSelec
     });
   };
 
+  const handleSeasonChange = (seasonNumber: number) => {
+    setSelectedSeason(seasonNumber);
+    if (onSeasonChange) {
+      onSeasonChange(seasonNumber);
+    }
+  };
+
   return (
-    <div className="flex gap-8">
-      {/* Season selector on the left */}
-      <div className="w-48">
+    <div className="flex flex-col md:flex-row md:gap-8">
+      {/* Season selector - full width on mobile, fixed width on larger screens */}
+      <div className="w-full md:w-48 mb-4 md:mb-0">
         <select
           value={selectedSeason}
-          onChange={(e) => setSelectedSeason(Number(e.target.value))}
+          onChange={(e) => handleSeasonChange(Number(e.target.value))}
           className="w-full px-4 py-2 bg-black/40 text-lg rounded-lg focus:outline-none focus:ring-2 focus:ring-nebula-600"
         >
           {seasons.map((season) => (
@@ -58,8 +66,8 @@ export default function SeasonSelector({ seasons, onEpisodeSelect }: SeasonSelec
         </select>
       </div>
 
-      {/* Episodes list on the right */}
-      <div className="flex-1 max-h-[60vh] overflow-y-auto pr-4 space-y-2">
+      {/* Episodes list - below on mobile, to the right on larger screens */}
+      <div className="flex-1 max-h-[60vh] overflow-y-auto pr-0 md:pr-4 space-y-2">
         {currentSeason?.episodes.map((episode) => (
           <button
             key={episode.id}

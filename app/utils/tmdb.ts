@@ -260,6 +260,13 @@ export const tmdb = {
     return response.json();
   },
 
+  async getSeasonVideos(showId: string, seasonNumber: number) {
+    const response = await fetch(
+      `${TMDB_BASE_URL}/tv/${showId}/season/${seasonNumber}/videos?api_key=${TMDB_API_KEY}&language=en-US`
+    );
+    return response.json();
+  },
+
   async getShow(id: string) {
     const [show, credits, videos, similar] = await Promise.all([
       fetch(`${TMDB_BASE_URL}/tv/${id}?api_key=${TMDB_API_KEY}&language=en-US`).then(res => res.json()),

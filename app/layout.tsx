@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { inter, outfit } from "./utils/fonts";
 import "./globals.css";
-import "./styles/video-player.css";
 import BottomNavWrapper from "./components/BottomNavWrapper";
 
 export const metadata: Metadata = {

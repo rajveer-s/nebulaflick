@@ -26,6 +26,6 @@ export function getGenreName(genreId: number): string {
   return TMDB_GENRES[genreId as GenreId] || 'Unknown';
 }
 
-export function getPrimaryGenre(genreIds: number[]): string {
-  return genreIds.length > 0 ? getGenreName(genreIds[0]) : 'Movie';
-} 
+export function getPrimaryGenre(genreIds?: number[]): string {
+  return genreIds && genreIds.length > 0 ? getGenreName(genreIds[0]) : 'Movie';
+}

@@ -91,48 +91,56 @@ export default function SearchPage() {
         </h1>
 
         {/* ── Search Bar with Filter Tags ────────────────────────────── */}
-        <form onSubmit={onSubmit} className="mb-3">
-          <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-full overflow-hidden">
-            {/* tag for Movies */}
-            {selMovies && (
-              <span className="flex items-center bg-white text-black rounded-full px-3 py-1 text-sm mr-2">
-                Movies
-                <button
-                  type="button"
-                  onClick={() => setSelMovies(false)}
-                  className="ml-2 text-gray-500 hover:text-gray-700"
-                >
-                  ×
-                </button>
-              </span>
-            )}
-            {/* tag for TV Shows */}
-            {selShows && (
-              <span className="flex items-center bg-white text-black rounded-full px-3 py-1 text-sm mr-2">
-                TV Shows
-                <button
-                  type="button"
-                  onClick={() => setSelShows(false)}
-                  className="ml-2 text-gray-500 hover:text-gray-700"
-                >
-                  ×
-                </button>
-              </span>
-            )}
-            <input
-              type="text"
-              name="q"
-              value={q}
-              onChange={e => setQ(e.target.value)}
-              placeholder="Search Movies & TV Shows"
-              className="flex-1 px-6 py-3 bg-transparent text-black placeholder-gray-400 focus:outline-none"
-            />
-            <button
-              type="submit"
-              className="px-6 py-3 bg-white text-black font-medium hover:bg-gray-100 transition"
-            >
-              Search Now
-            </button>
+        <form onSubmit={onSubmit} className="mb-6">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-full flex flex-wrap justify-center gap-2 mb-2">
+              {/* tag for Movies */}
+              {selMovies && (
+                <span className="flex items-center bg-purple-600/90 text-white rounded-full px-3 py-1 text-sm border border-white">
+                  Movies
+                  <button
+                    type="button"
+                    onClick={() => setSelMovies(false)}
+                    className="ml-2 text-white/70 hover:text-white"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+              {/* tag for TV Shows */}
+              {selShows && (
+                <span className="flex items-center bg-purple-600/90 text-white rounded-full px-3 py-1 text-sm border border-white">
+                  TV Shows
+                  <button
+                    type="button"
+                    onClick={() => setSelShows(false)}
+                    className="ml-2 text-white/70 hover:text-white"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+            </div>
+            
+            <div className="flex w-full max-w-xl items-center gap-3 mx-auto">
+              <div className="relative w-full">
+                <input
+                  type="text"
+                  name="q"
+                  value={q}
+                  onChange={e => setQ(e.target.value)}
+                  placeholder="Search Movies & TV Shows"
+                  className="w-full px-5 py-3 bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-xl shadow-sm"
+                />
+              </div>
+              
+              <button
+                type="submit"
+                className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl shadow-md transition-colors duration-200 whitespace-nowrap border border-white"
+              >
+                Search
+              </button>
+            </div>
           </div>
         </form>
 
@@ -166,13 +174,12 @@ export default function SearchPage() {
         ) : (
           <>
             {/* Movies Grid */}
-            {(selMovies || (!selMovies && !selShows)) && (
+            {movies.length > 0 && (
               <section className="mb-12">
-                {(!selShows && selMovies) && (
-                  <h2 className="text-2xl font-semibold text-white mb-4">
-                    Movies
-                  </h2>
-                )}
+                {/* Always show Movies heading when movies are displayed */}
+                <h2 className="text-2xl font-semibold text-white mb-4">
+                  Movies
+                </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                   {movies.map(m => (
                     <Link key={m.id} href={`/movie/${m.id}`} className="group">
@@ -217,13 +224,11 @@ export default function SearchPage() {
             )}
 
             {/* TV Shows Grid */}
-            {(selShows || (!selMovies && !selShows)) && (
+            {shows.length > 0 && (
               <section>
-                {(selMovies && !selShows) && (
-                  <h2 className="text-2xl font-semibold text-white mb-4">
-                    TV Shows
-                  </h2>
-                )}
+                <h2 className="text-2xl font-semibold text-white mb-4">
+                  TV Shows
+                </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                   {shows.map(s => (
                     <Link key={s.id} href={`/show/${s.id}`} className="group">

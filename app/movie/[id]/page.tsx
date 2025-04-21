@@ -7,7 +7,6 @@ import { Play, Star, Clock, Calendar, Loader2 } from 'lucide-react';
 import { tmdb } from '@/app/utils/tmdb';
 import { getGenreName } from '@/app/utils/genres';
 import { torrentio } from '@/app/utils/torrentio';
-import VideoPlayer from '@/app/components/VideoPlayer';
 import MovieCarousel from '@/app/components/MovieCarousel';
 import StreamModal from '@/app/components/StreamModal';
 
@@ -83,10 +82,17 @@ export default function MoviePage() {
   const posterUrl = tmdb.getImageUrl(movie.poster_path);
   const backdropUrl = tmdb.getImageUrl(movie.backdrop_path);
 
+  // Convert trailer URL to embed format for iframe with additional parameters
+  // rel=0 removes related videos, modestbranding=1 shows minimal YouTube branding
+  // hd=1 forces HD quality if available, controls=1 ensures player controls are shown
+  const embedTrailerUrl = trailerUrl
+    ? trailerUrl.replace('youtube.com/watch?v=', 'youtube.com/embed/').replace('?v=', '/') + '?rel=0&modestbranding=1&hd=1&controls=1&autoplay=0' 
+    : null;
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-nebula-950 to-black">
-      {/* Hero Section */}
-      <div className="relative h-[85vh] w-full">
+      {/* Hero Section - Added padding-top for better visibility on all screens */}
+      <div className="relative min-h-screen w-full">
         <div className="absolute inset-0">
           {backdropUrl && (
             <Image
@@ -101,40 +107,59 @@ export default function MoviePage() {
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent" />
         </div>
 
-        <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-full items-end pb-24">
-            <div className="flex flex-col md:flex-row gap-8 items-start">
-              {/* Movie Poster */}
-              <div className="shrink-0 w-48 md:w-64 rounded-lg overflow-hidden">
-                {posterUrl && (
-                  <Image
-                    src={posterUrl}
-                    alt={movie.title}
-                    width={256}
-                    height={384}
-                    className="w-full"
-                  />
+        <div className="relative min-h-screen max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Changed to flex with proper padding instead of absolute positioning */}
+          <div className="flex flex-col justify-center pt-24 pb-16 min-h-screen">
+            <div className="w-full">
+              {/* Poster and Trailer Section */}
+              <div className="flex flex-col md:flex-row gap-6 mb-8">
+                {/* Poster */}
+                <div className="shrink-0 w-48 md:w-64 rounded-lg overflow-hidden">
+                  {posterUrl && (
+                    <Image
+                      src={posterUrl}
+                      alt={movie.title}
+                      width={256}
+                      height={384}
+                      className="w-full rounded-lg shadow-lg"
+                    />
+                  )}
+                </div>
+
+                {/* Trailer Player */}
+                {trailerUrl && (
+                  <div className="flex-1 w-full aspect-video rounded-lg overflow-hidden shadow-lg">
+                    <iframe
+                      className="w-full h-full rounded-lg"
+                      src={embedTrailerUrl || undefined}
+                      title={`${movie.title} Trailer`}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
                 )}
               </div>
 
-              {/* Movie Info */}
-              <div className="flex-1">
+              {/* Movie Info Section - Below poster and trailer */}
+              <div className="max-w-3xl">
                 <h1 className="text-4xl font-bold mb-4">{movie.title}</h1>
+                
                 <div className="flex flex-wrap items-center gap-4 text-sm mb-6">
                   {movie.vote_average && (
-                    <span className="flex items-center">
+                    <span className="flex items-center bg-white/10 rounded-full px-3 py-1">
                       <Star className="w-4 h-4 mr-1" />
                       {typeof movie.vote_average === 'number' ? movie.vote_average.toFixed(1) : movie.vote_average}
                     </span>
                   )}
                   {movie.runtime && (
-                    <span className="flex items-center">
+                    <span className="flex items-center bg-white/10 rounded-full px-3 py-1">
                       <Clock className="w-4 h-4 mr-1" />
                       {tmdb.formatRuntime(movie.runtime)}
                     </span>
                   )}
                   {movie.release_date && (
-                    <span className="flex items-center">
+                    <span className="flex items-center bg-white/10 rounded-full px-3 py-1">
                       <Calendar className="w-4 h-4 mr-1" />
                       {typeof movie.release_date === 'string' 
                         ? tmdb.formatYear(movie.release_date) 
@@ -142,36 +167,26 @@ export default function MoviePage() {
                     </span>
                   )}
                   {movie.genres && (
-                    <span>{movie.genres?.map((g: any) => g.name).join(', ')}</span>
+                    <span className="bg-white/10 rounded-full px-3 py-1">{movie.genres?.map((g: any) => g.name).join(', ')}</span>
                   )}
                 </div>
-
+                
                 <p className="text-lg text-white/90 mb-8">{movie.overview}</p>
-
-                <div className="flex gap-4">
-                  {movie.imdbId && (
-                    <button
-                      onClick={handlePlayClick}
-                      disabled={isLoading}
-                      className="flex items-center gap-2 px-8 py-3 bg-white text-black rounded-lg font-semibold hover:bg-white/90 transition disabled:opacity-50"
-                    >
-                      {isLoading ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                      ) : (
-                        <Play className="w-5 h-5" />
-                      )}
-                      Watch Now
-                    </button>
-                  )}
-                  {trailerUrl && (
-                    <button
-                      onClick={() => window.open(trailerUrl, '_blank')}
-                      className="flex items-center gap-2 px-8 py-3 bg-white/10 rounded-lg font-semibold hover:bg-white/20 transition"
-                    >
-                      Watch Trailer
-                    </button>
-                  )}
-                </div>
+                
+                {movie.imdbId && (
+                  <button
+                    onClick={handlePlayClick}
+                    disabled={isLoading}
+                    className="flex items-center gap-2 px-8 py-3 bg-white text-black rounded-lg font-semibold hover:bg-white/90 transition disabled:opacity-50"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <Play className="w-5 h-5" />
+                    )}
+                    Watch Now
+                  </button>
+                )}
               </div>
             </div>
           </div>
