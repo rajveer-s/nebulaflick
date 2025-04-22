@@ -31,15 +31,10 @@ export default function FeaturedBanner({
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % movies.length)
-    }, 10000)
+    }, 6000)
 
     return () => clearInterval(interval)
   }, [movies.length])
-
-  // Handle indicator click
-  const handleIndicatorClick = (index: number) => {
-    setCurrentSlide(index)
-  }
 
   if (!movies.length) return null
   

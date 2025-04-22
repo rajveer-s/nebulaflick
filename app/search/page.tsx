@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -9,13 +9,13 @@ import LoadingSpinner from '@/app/components/LoadingSpinner'
 import { tmdb } from '@/app/utils/tmdb'
 import { getPrimaryGenre } from '@/app/utils/genres'
 
-export default function SearchPage() {
+function SearchContent() {
   const router = useRouter()
   const params = useSearchParams()
 
   // read initial q from URL
   const initialQ = params.get('q') ?? ''
-  // read initial type flags from URL (we’ll encode type as "movies", "shows", or "both")
+  // read initial type flags from URL (we'll encode type as "movies", "shows", or "both")
   const initialType = params.get('type') ?? 'both'
 
   // local state
@@ -162,7 +162,7 @@ export default function SearchPage() {
                 ? 'bg-white text-black'
                 : 'bg-white/20 text-white hover:bg-white/30'}`}
           >
-            TV Shows
+            TV Shows
           </button>
         </div>
 
@@ -216,7 +216,7 @@ export default function SearchPage() {
                   ))}
                   {q && movies.length === 0 && (
                     <p className="text-center text-white/70 col-span-full">
-                      No movies found for "{q}"
+                      No movies found for &quot;{q}&quot;
                     </p>
                   )}
                 </div>
@@ -265,7 +265,7 @@ export default function SearchPage() {
                   ))}
                   {q && shows.length === 0 && (
                     <p className="text-center text-white/70 col-span-full">
-                      No TV shows found for "{q}"
+                      No TV shows found for &quot;{q}&quot;
                     </p>
                   )}
                 </div>
@@ -275,5 +275,13 @@ export default function SearchPage() {
         )}
       </div>
     </main>
+  )
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <SearchContent />
+    </Suspense>
   )
 }

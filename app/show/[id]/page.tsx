@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { use } from 'react';
 import Image from 'next/image';
-import { Play, Star, Clock, Calendar, Loader2 } from 'lucide-react';
+import { Star, Clock, Calendar, Loader2 } from 'lucide-react';
 import { tmdb } from '@/app/utils/tmdb';
 import { getGenreName } from '@/app/utils/genres';
 import { torrentio } from '@/app/utils/torrentio';
@@ -16,14 +16,73 @@ interface Genre {
   name: string;
 }
 
+interface TVShow {
+  id: number;
+  name: string;
+  overview: string;
+  poster_path: string;
+  backdrop_path: string;
+  first_air_date: string;
+  vote_average: number;
+  episode_run_time?: number[];
+  number_of_seasons: number;
+  number_of_episodes: number;
+  status: string;
+  networks?: { name: string }[];
+  genres?: Genre[];
+  imdbId?: string;
+  videos?: {
+    results: {
+      id: string;
+      key: string;
+      name: string;
+      site: string;
+      type: string;
+    }[];
+  };
+  similar?: {
+    results: TVShowResult[];
+  };
+  seasons: Season[];
+}
+
+interface TVShowResult {
+  id: number;
+  name: string;
+  poster_path: string;
+  genre_ids?: number[];
+}
+
+interface Season {
+  id: number;
+  name: string;
+  season_number: number;
+  episodes: Episode[];
+}
+
+interface Episode {
+  id: number;
+  name: string;
+  episode_number: number;
+  overview: string;
+  still_path: string;
+  air_date: string;
+}
+
+interface Stream {
+  name: string;
+  title: string;
+  url: string;
+}
+
 export default function ShowPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
-  const [show, setShow] = useState<any>(null);
-  const [streams, setStreams] = useState<any[]>([]);
+  const [show, setShow] = useState<TVShow | null>(null);
+  const [streams, setStreams] = useState<Stream[]>([]);
   const [showStreamModal, setShowStreamModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const [seasons, setSeasons] = useState<any[]>([]);
+  const [seasons, setSeasons] = useState<Season[]>([]);
   const [selectedSeason, setSelectedSeason] = useState<number | null>(null);
   const [selectedEpisode, setSelectedEpisode] = useState<number | null>(null);
   const [currentTrailerUrl, setCurrentTrailerUrl] = useState<string | null>(null);
@@ -36,7 +95,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
         setShow({ ...showData, imdbId });
 
         // Load season details
-        const seasonPromises = showData.seasons.map((season: any) =>
+        const seasonPromises = showData.seasons.map((season: Season) =>
           tmdb.getSeasonDetails(resolvedParams.id, season.season_number)
         );
         const seasonDetails = await Promise.all(seasonPromises);
@@ -48,7 +107,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
         
         // Set initial selected season if seasons exist
         if (seasonDetails && seasonDetails.length > 0) {
-          const firstValidSeason = seasonDetails.find((season: any) => season.season_number > 0) || seasonDetails[0];
+          const firstValidSeason = seasonDetails.find((season: Season) => season.season_number > 0) || seasonDetails[0];
           setSelectedSeason(firstValidSeason.season_number);
         }
       } catch (error) {
@@ -73,13 +132,13 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
         setCurrentTrailerUrl(seasonTrailerUrl);
       } else {
         // If no season-specific trailer is found, fall back to the main show trailer
-        const mainTrailerUrl = tmdb.getTrailer(show.videos);
+        const mainTrailerUrl = tmdb.getTrailer(show?.videos);
         setCurrentTrailerUrl(mainTrailerUrl);
       }
     } catch (error) {
       console.error('Failed to fetch season videos:', error);
       // Fall back to main trailer in case of error
-      const mainTrailerUrl = tmdb.getTrailer(show.videos);
+      const mainTrailerUrl = tmdb.getTrailer(show?.videos);
       setCurrentTrailerUrl(mainTrailerUrl);
     }
   };
@@ -88,9 +147,9 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
     try {
       setSelectedSeason(seasonNumber);
       setSelectedEpisode(episodeNumber);
-      setIsLoading(true);
+      setLoading(true);
       
-      if (!show.imdbId) {
+      if (!show?.imdbId) {
         alert('IMDb ID not found for this show');
         return;
       }
@@ -112,7 +171,7 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
       console.error('Failed to fetch streams:', error);
       alert('Failed to fetch streams. Please try again.');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -234,16 +293,16 @@ export default function ShowPage({ params }: { params: Promise<{ id: string }> }
       </div>
 
       {/* Similar Shows */}
-      {show.similar?.results?.length > 0 && (
+      {show.similar?.results && show.similar.results.length > 0 && (
         <section className="py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl font-semibold mb-6">Similar Shows</h2>
             <MovieCarousel
-              movies={show.similar.results.map((s: any) => ({
+              movies={show.similar.results.map((s: TVShowResult) => ({
                 id: s.id.toString(),
                 title: s.name,
                 posterUrl: tmdb.getImageUrl(s.poster_path, 'w500'),
-                genre: getGenreName(s.genre_ids?.[0]),
+                genre: getGenreName(s.genre_ids?.[0] || 0),
               }))}
               type="show"
             />

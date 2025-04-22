@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Film, Tv, Search, User } from 'lucide-react';
 
@@ -15,7 +16,7 @@ export default function BottomNav() {
   ];
 
   return (
-    <>
+    <>   
       <div className="h-20" /> {/* Bottom spacer */}
       <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[80%] sm:w-[60%] bg-neutral-900/90 backdrop-blur-md border border-white/10 rounded-2xl shadow-lg">
         <div className="flex items-center justify-around h-16 px-2">

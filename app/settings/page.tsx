@@ -94,7 +94,7 @@ export default function SettingsPage() {
                 <ol className="list-decimal list-inside space-y-2 text-sm text-white/70">
                   <li>Visit the Torrentio configuration page</li>
                   <li>Select your preferred providers and settings</li>
-                  <li>Click "Install" and copy the generated URL</li>
+                  <li>Click &quot;Install&quot; and copy the generated URL</li>
                   <li>Paste the URL here and save</li>
                 </ol>
               </div>

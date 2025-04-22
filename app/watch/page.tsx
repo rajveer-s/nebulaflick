@@ -2,12 +2,30 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
+import { Suspense, useEffect, useState } from 'react';
 import ShakaPlayer from '../components/ShakaPlayer';
+import LoadingSpinner from '../components/LoadingSpinner';
 
-export default function WatchPage() {
+function WatchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const videoUrl = searchParams.get('url');
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+
+  // Use useEffect to handle URL extraction to ensure it's available after navigation
+  useEffect(() => {
+    // Get the URL from search params and decode it if needed
+    const urlParam = searchParams.get('url');
+    if (urlParam) {
+      try {
+        // Some URLs might be double-encoded, so we'll try to decode
+        const decodedUrl = decodeURIComponent(urlParam);
+        setVideoUrl(decodedUrl);
+      } catch (e) {
+        // If decoding fails, use the URL as-is
+        setVideoUrl(urlParam);
+      }
+    }
+  }, [searchParams]);
 
   const handleBackClick = () => {
     router.back();
@@ -16,7 +34,7 @@ export default function WatchPage() {
   if (!videoUrl) {
     return (
       <div className="fixed inset-0 bg-black flex items-center justify-center">
-        <p className="text-white/70">No video URL provided</p>
+        <p className="text-white/70">Loading video URL...</p>
       </div>
     );
   }
@@ -38,5 +56,17 @@ export default function WatchPage() {
         <ShakaPlayer url={videoUrl} />
       </div>
     </div>
+  );
+}
+
+export default function WatchPage() {
+  return (
+    <Suspense fallback={
+      <div className="fixed inset-0 bg-black flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    }>
+      <WatchContent />
+    </Suspense>
   );
 }

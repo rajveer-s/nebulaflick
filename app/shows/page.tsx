@@ -5,19 +5,35 @@ import FeaturedBanner from '../components/FeaturedBanner';
 import MovieCarousel from '../components/MovieCarousel';
 import LoadingSpinner from '../components/LoadingSpinner';
 
+// Define a proper interface for TV show data from TMDb
+interface TMDbShow {
+  id: number;
+  name: string;
+  title?: string;
+  overview: string;
+  backdrop_path: string | null;
+  poster_path: string | null;
+  first_air_date: string;
+  vote_average: number;
+  episode_run_time?: number[];
+  genre_ids?: number[];
+  genre?: string;
+  posterUrl?: string;
+}
+
 async function getShows() {
   try {
     // Get trending shows for the featured banner
     const trending = await tmdb.getTrendingShows();
     
-    // Get a featured show (using the first trending one)
-    const featured = trending.length > 0 ? [trending[0]] : [];
+    // Get top 5 trending shows for the featured banner
+    const featured = trending.slice(0, 5);
     
     // Get all catalogs of shows by streaming service
     const catalogs = await tmdb.getShowCatalogs();
     
     return {
-      featured,            // Use first trending show for the featured banner
+      featured,            // Use top 5 trending shows for the featured banner
       trending: trending,  // Keep all trending shows in the trending section
       ...catalogs
     };
@@ -53,15 +69,15 @@ export default async function ShowsPage() {
   }
 
   // Transform TMDb show data to match our component props
-  const transformShow = (show: any) => ({
+  const transformShow = (show: TMDbShow) => ({
     id: show.id.toString(),
-    title: show.name || show.title,
+    title: show.name || show.title || 'Unknown Show',
     description: show.overview,
     backdropUrl: tmdb.getImageUrl(show.backdrop_path),
     posterUrl: show.posterUrl || tmdb.getImageUrl(show.poster_path, 'w500'),
     year: show.first_air_date ? tmdb.formatYear(show.first_air_date) : 0,
-    rating: show.vote_average ? show.vote_average.toFixed(1) : undefined,
-    duration: show.episode_run_time ? `${show.episode_run_time?.[0] || 45}m` : '',
+    rating: show.vote_average ? show.vote_average.toFixed(1) : '0.0',
+    duration: show.episode_run_time ? `${show.episode_run_time?.[0] || 45}m` : '45m',
     genre: show.genre || getPrimaryGenre(show.genre_ids),
   });
 

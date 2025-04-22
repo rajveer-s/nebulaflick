@@ -1,11 +1,34 @@
-import { useState } from 'react';
 import Image from 'next/image';
 import { X } from 'lucide-react';
 import SeasonSelector from './SeasonSelector';
 
+// Define interfaces to match the ones in SeasonSelector component
+interface Episode {
+  id: number;
+  name: string;
+  episode_number: number;
+  overview: string;
+  still_path: string;
+  air_date: string;
+}
+
+interface Season {
+  id: number;
+  name: string;
+  season_number: number;
+  episodes: Episode[];
+}
+
+interface ShowData {
+  id: number;
+  name: string;
+  backdrop_path: string;
+  overview?: string;
+}
+
 interface WatchShowModalProps {
-  show: any;
-  seasons: any[];
+  show: ShowData;
+  seasons: Season[];
   onEpisodeSelect: (seasonNumber: number, episodeNumber: number) => void;
   isOpen: boolean;
   onClose: () => void;

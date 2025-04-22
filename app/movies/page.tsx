@@ -11,14 +11,14 @@ async function getMovies() {
     // Get trending movies for the featured banner
     const trending = await tmdb.getTrendingMovies();
     
-    // Get a featured movie (using the first trending one)
-    const featured = trending.length > 0 ? [trending[0]] : [];
+    // Get top 5 trending movies for the featured banner
+    const featured = trending.slice(0, 5);
     
     // Get all catalogs of movies by streaming service
     const catalogs = await tmdb.getMovieCatalogs();
     
     return {
-      featured,            // Use first trending movie for the featured banner
+      featured,            // Use top 5 trending movies for the featured banner
       trending: trending,  // Keep all trending movies in the trending section
       ...catalogs
     };
