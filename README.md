@@ -2,8 +2,10 @@
 
 Welcome to NebulaFlick, a cutting-edge streaming platform built with Next.js, React 19, and Shaka Player that provides a seamless movie and TV show browsing and streaming experience.
 
-[![Watch the demo video](https://i.vimeocdn.com/video/1077755591-ce79097162)](https://vimeo.com/manage/videos/1077755591/ce79097162)
-▶️ [Watch the demo video](https://vimeo.com/manage/videos/1077755591/ce79097162)
+<video width="100%" controls>
+  <source src="public/nebulaflick.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
 
 ## 📋 Features
 
