@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { X } from 'lucide-react';
+import { useEffect } from 'react';
 import SeasonSelector from './SeasonSelector';
 
 // Define interfaces to match the ones in SeasonSelector component
@@ -41,6 +42,19 @@ export default function WatchShowModal({
   isOpen,
   onClose,
 }: WatchShowModalProps) {
+  // Disable scrolling on main page when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      // Add class to disable scrolling
+      document.body.classList.add('overflow-hidden');
+      
+      // Cleanup: remove the class when component unmounts or modal closes
+      return () => {
+        document.body.classList.remove('overflow-hidden');
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (

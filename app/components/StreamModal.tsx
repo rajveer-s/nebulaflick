@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Play, X, Loader2 } from 'lucide-react';
 import type { TorrentioStream } from '../utils/torrentio';
@@ -25,6 +25,17 @@ const getQualityPriority = (quality: string): number => {
 export default function StreamModal({ streams, onClose, movieTitle = 'Movie' }: StreamModalProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<string | null>(null);
+
+  // Disable scrolling on main page when modal is open
+  useEffect(() => {
+    // Add class to disable scrolling
+    document.body.classList.add('overflow-hidden');
+    
+    // Cleanup: remove the class when component unmounts
+    return () => {
+      document.body.classList.remove('overflow-hidden');
+    };
+  }, []);
 
   // Sort streams by quality
   const sortedStreams = [...streams].sort((a, b) => {
